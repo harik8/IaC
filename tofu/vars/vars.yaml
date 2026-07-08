@@ -33,6 +33,11 @@ eks:
         - namespace: "kube-system"
           labels:
             "eks.amazonaws.com/component": "coredns"
+    - name: "gha-runners"
+      selectors:
+        - namespace: "gha-runner"
+          labels:
+            "app.kubernetes.io/name": "gha-runner"
 iam:
   github_oidc:
     repos: ["harik8/manalpetti:*","harik8/hariprasad.dev:*","harik8/awsing:*"]
