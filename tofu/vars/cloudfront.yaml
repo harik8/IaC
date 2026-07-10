@@ -42,7 +42,7 @@
   origin:
     s3_nobleworkfoundation:
       domain_name: "${workspace}-nobleworkfoundation.s3.${aws_region}.amazonaws.com"
-      origin_access_control_key: "s3"
+      origin_access_control_key: "s3_nobleworkfoundation"
   default_root_object: "index.html"
   default_cache_behavior:
     target_origin_id: "s3_nobleworkfoundation"
