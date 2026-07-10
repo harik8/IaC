@@ -37,7 +37,7 @@
               "Resource": "arn:aws:s3:::${workspace}-nobleworkfoundation/*",
               "Condition": {
                   "StringEquals": {
-                      "AWS:SourceArn": "arn:aws:cloudfront::${account_id}:distribution/*"
+                      "AWS:SourceArn": "arn:aws:cloudfront::${account_id}:distribution/ELOLXQI0OGFQQ"
                   }
               }
           }
