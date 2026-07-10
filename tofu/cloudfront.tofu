@@ -16,3 +16,4 @@ module "cloudfront" {
 
   logging_config = try(local.cloudfront_vars[count.index]["logging_config"], null)
 }
+
