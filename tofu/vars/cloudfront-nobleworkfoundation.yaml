@@ -1,0 +1,40 @@
+---
+- name: nobleworkfoundation
+  aliases:
+    - nobleworkfoundation.org
+    - www.nobleworkfoundation.org
+  create_oac: true
+  create_oai: false
+  logging_config:
+    bucket: ${workspace}-nobleworkfoundation.s3.${aws_region}.amazonaws.com
+  origin:
+    s3_nobleworkfoundation:
+      domain_name: "${workspace}-nobleworkfoundation.s3.${aws_region}.amazonaws.com"
+      origin_access_control_key: "s3"
+  default_root_object: "index.html"
+  default_cache_behavior:
+    target_origin_id: "s3_nobleworkfoundation"
+    viewer_protocol_policy: "redirect-to-https"
+    allowed_methods: ["GET", "HEAD", "OPTIONS"]
+    cached_methods: ["GET", "HEAD"]
+    compress: true
+    query_string: false
+  ordered_cache_behavior:
+    - path_pattern: "/img/*"
+      target_origin_id: "s3_nobleworkfoundation"
+      viewer_protocol_policy: "redirect-to-https"
+      allowed_methods: ["GET", "HEAD", "OPTIONS"]
+      cached_methods: ["GET", "HEAD"]
+      compress: true
+      query_string: false
+    - path_pattern: "/icons/*"
+      target_origin_id: "s3_nobleworkfoundation"
+      viewer_protocol_policy: "redirect-to-https"
+      allowed_methods: ["GET", "HEAD", "OPTIONS"]
+      cached_methods: ["GET", "HEAD"]
+      compress: true
+      query_string: false
+  viewer_certificate:
+    acm_certificate_arn: "arn:aws:acm:us-east-1:${account_id}:certificate/0cdad2e5-c8f8-45e2-82d9-d8e9df8d0f73"
+    minimum_protocol_version: "TLSv1.2_2021"
+    ssl_support_method: "sni-only"
