@@ -10,7 +10,7 @@
   origin:
     s3_hp_dev:
       domain_name:  "${workspace}-hp-dev.s3.${aws_region}.amazonaws.com"
-      origin_access_control_key: "s3"
+      origin_access_control_key: "s3_hp-dev"
   default_root_object: "static/index.html"
   default_cache_behavior:
     target_origin_id: "s3_hp_dev"
@@ -35,14 +35,14 @@
   aliases:
     - nobleworkfoundation.org
     - www.nobleworkfoundation.org
-  create_oac: false
+  create_oac: true
   create_oai: false
   logging_config:
     bucket: ${workspace}-nobleworkfoundation.s3.${aws_region}.amazonaws.com
   origin:
     s3_nobleworkfoundation:
       domain_name: "${workspace}-nobleworkfoundation.s3.${aws_region}.amazonaws.com"
-      origin_access_control_id: "E26H32Z37ZAYJF"
+      origin_access_control_key: "s3_nobleworkfoundation"
   default_root_object: "index.html"
   default_cache_behavior:
     target_origin_id: "s3_nobleworkfoundation"
