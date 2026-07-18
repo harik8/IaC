@@ -1,5 +1,6 @@
 ---
 versions:
+  alb: v9.13.0
   cloudfront: v6.7.0
   ec2: v6.4.0
   ecs: v7.5.0
@@ -22,7 +23,7 @@ ecs:
 efs:
   create: false
 eks:
-  create: true
+  create: false
   cluster_version: 1.36
   sc:
     gp3: false
@@ -41,6 +42,9 @@ eks:
 iam:
   github_oidc:
     repos: ["harik8/manalpetti:*","harik8/hariprasad.dev:*","harik8/awsing:*"]
+nlb:
+  create: false
+  internal: false
 rds:
   psql:
     create: false
@@ -50,5 +54,5 @@ vpc:
   create: true
   cidr: 10.100.0.0/16
   nat_gateway:
-    enable: true
+    enable: false
     single: true
