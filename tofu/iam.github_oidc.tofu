@@ -58,7 +58,10 @@ module "iam_assumable_role_github_hp_dev" {
 
   trust_policy_permissions = {
     AllowAssumeRole = {
-      actions = ["sts:AssumeRole"]
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
       principals = [{
         type        = "AWS"
         identifiers = [module.iam_github_oidc_role.arn]
@@ -95,8 +98,8 @@ module "iam_assumable_role_github_awsing" {
     }
   }
 
-  policies = {
-    AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
-  }
+  # policies = {
+  #   AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
+  # }
 }
 
