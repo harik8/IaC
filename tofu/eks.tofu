@@ -136,13 +136,21 @@ resource "kubernetes_storage_class_v1" "efs" {
   volume_binding_mode = "Immediate"
 }
 
-module "eks_managed_node_group" {
+# ── Self-managed node groups ──────────────────────────────────────────────────
+# Self-managed nodes give full control over the launch template and ASG.
+# SPOT is configured via instance_market_options instead of capacity_type.
+# The module creates its own IAM role + instance profile and registers an
+# access entry so nodes can join the cluster automatically.
+
+# ── EKS managed node groups ───────────────────────────────────────────────────
+
+module "eks_managed_node_group_application" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
   version = local.vars.versions.eks
 
   create = local.vars.eks.create
 
-  name                 = terraform.workspace
+  name                 = "${terraform.workspace}-application"
   cluster_name         = terraform.workspace
   kubernetes_version   = local.vars.eks.cluster_version
   cluster_service_cidr = module.eks.cluster_service_cidr
@@ -160,7 +168,6 @@ module "eks_managed_node_group" {
 
   instance_types = ["t4g.small"]
   capacity_type  = "SPOT"
-
 
   block_device_mappings = {
     xvda = {
@@ -184,6 +191,103 @@ module "eks_managed_node_group" {
     AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   }
 }
+
+module "eks_managed_node_group_ingress_controller" {
+  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  version = local.vars.versions.eks
+
+  create = local.vars.eks.create
+
+  name                 = "${terraform.workspace}-ingress"
+  cluster_name         = terraform.workspace
+  kubernetes_version   = local.vars.eks.cluster_version
+  cluster_service_cidr = module.eks.cluster_service_cidr
+
+  subnet_ids = module.vpc.private_subnets
+
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+  ami_type = "AL2023_ARM_64_STANDARD"
+
+  min_size     = 1
+  max_size     = 1
+  desired_size = 1
+
+  instance_types = ["t4g.small"]
+  capacity_type  = "SPOT"
+
+  block_device_mappings = {
+    xvda = {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_type = "gp3"
+        encrypted   = true
+      }
+    }
+  }
+
+  taints = {
+    dedicated = {
+      key    = "ingress-controller"
+      value  = "true"
+      effect = "NO_SCHEDULE"
+    }
+  }
+
+  iam_role_additional_policies = {
+    AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  }
+}
+
+module "eks_managed_node_group_core_addons" {
+  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  version = local.vars.versions.eks
+
+  create = local.vars.eks.create
+
+  name                 = "${terraform.workspace}-core-addons"
+  cluster_name         = terraform.workspace
+  kubernetes_version   = local.vars.eks.cluster_version
+  cluster_service_cidr = module.eks.cluster_service_cidr
+
+  subnet_ids = module.vpc.private_subnets
+
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+  ami_type = "AL2023_ARM_64_STANDARD"
+
+  min_size     = 1
+  max_size     = 1
+  desired_size = 1
+
+  instance_types = ["t4g.small"]
+  capacity_type  = "SPOT"
+
+  block_device_mappings = {
+    xvda = {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_type = "gp3"
+        encrypted   = true
+      }
+    }
+  }
+
+  taints = {
+    dedicated = {
+      key    = "core-addons"
+      value  = "true"
+      effect = "NO_SCHEDULE"
+    }
+  }
+
+  iam_role_additional_policies = {
+    AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  }
+}
+
 
 module "irsa_efs_csi" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
